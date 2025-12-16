@@ -1,13 +1,13 @@
-'use client';
-
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, LogOut } from 'lucide-react';
-import Background from '@/components/Background';
-import SidebarItem from '@/components/SidebarItem';
-import ResumePreview from '@/components/ResumePreview';
-import { RESUME_SECTIONS } from '@/constants/resumeSections';
+import Background from '../components/Background';
+import SidebarItem from '../components/SidebarItem';
+import ResumePreview from '../components/ResumePreview';
+import { RESUME_SECTIONS } from '../constants/resumeSections';
 
-export default function EditorPage({ uploadedFile, resumeData, onInputChange, onBackToUpload }) {
+export default function EditorPage({ uploadedFile, resumeData, onInputChange }) {
+  const navigate = useNavigate();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState('basic');
 
@@ -82,7 +82,7 @@ export default function EditorPage({ uploadedFile, resumeData, onInputChange, on
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)}></div>
           <div className="absolute top-20 right-6 w-56 bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
-             <button onClick={onBackToUpload} className="w-full text-left px-5 py-3 text-sm text-red-300 hover:bg-red-500/20 hover:text-red-200 flex items-center gap-3 transition-colors">
+             <button onClick={() => navigate('/')} className="w-full text-left px-5 py-3 text-sm text-red-300 hover:bg-red-500/20 hover:text-red-200 flex items-center gap-3 transition-colors">
                <LogOut size={16} /> 退出编辑
              </button>
           </div>
@@ -91,4 +91,3 @@ export default function EditorPage({ uploadedFile, resumeData, onInputChange, on
     </div>
   );
 }
-

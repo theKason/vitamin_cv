@@ -1,14 +1,11 @@
-'use client';
-
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
-import UploadPage from '@/pages/UploadPage';
-import EditorPage from '@/pages/EditorPage';
+import UploadPage from './pages/UploadPage';
+import EditorPage from './pages/EditorPage';
 
-export default function Home() {
-  const [currentView, setCurrentView] = useState('upload');
+function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
 
-  // 简历数据状态
   const [resumeData, setResumeData] = useState({
     name: 'Alex Chen',
     title: 'Senior Product Designer',
@@ -30,26 +27,26 @@ export default function Home() {
 
   const handleFileUpload = (file) => {
     setUploadedFile(file);
-    setCurrentView('editor');
-  };
-
-  const handleBackToUpload = () => {
-    setCurrentView('upload');
   };
 
   return (
-    <>
-      {currentView === 'upload' ? (
-        <UploadPage onFileUpload={handleFileUpload} />
-      ) : (
-        <EditorPage 
-          uploadedFile={uploadedFile}
-          resumeData={resumeData}
-          onInputChange={handleInputChange}
-          onBackToUpload={handleBackToUpload}
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<UploadPage onFileUpload={handleFileUpload} />} />
+        <Route 
+          path="/editor" 
+          element={
+            <EditorPage 
+              uploadedFile={uploadedFile}
+              resumeData={resumeData}
+              onInputChange={handleInputChange}
+            />
+          } 
         />
-      )}
-    </>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
+export default App;

@@ -1,5 +1,3 @@
-'use client';
-
 export default function Background() {
   return (
     <div className="fixed inset-0 z-0 overflow-hidden bg-slate-900 pointer-events-none">

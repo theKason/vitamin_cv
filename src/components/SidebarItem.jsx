@@ -1,5 +1,3 @@
-'use client';
-
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
 export default function SidebarItem({ section, isExpanded, onToggle, resumeData, onInputChange }) {
