@@ -1,5 +1,3 @@
-'use client';
-
 import { Mail, Phone, MapPin, Globe, User, Briefcase, Award } from 'lucide-react';
 
 export default function ResumePreview({ resumeData }) {
