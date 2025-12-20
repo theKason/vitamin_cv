@@ -1,3 +1,6 @@
+/**
+ * This file contains the resume sections and their icons
+ */
 import { 
   User, 
   FileText, 

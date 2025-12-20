@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, FileText, Paperclip } from 'lucide-react';
 import Background from '../components/Background';
+import TopBar from '../components/TopBar';
 import type { UploadPageProps } from '../types';
 
 export default function UploadPage({ onFileUpload }: UploadPageProps) {
@@ -9,31 +10,42 @@ export default function UploadPage({ onFileUpload }: UploadPageProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [textInput, setTextInput] = useState('');
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) processFile(file);
+    if (file) {
+      setUploadedFile(file);
+    }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragOver(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setUploadedFile(e.dataTransfer.files[0]);
+    }
   };
 
-  const processFile = (file: File) => {
+  const handleStartOptimize = () => {
+    if (!textInput.trim() && !uploadedFile) return;
+    
     setIsUploading(true);
     setTimeout(() => {
       setIsUploading(false);
-      onFileUpload(file);
+      if (uploadedFile) {
+        onFileUpload(uploadedFile);
+      }
       navigate('/editor');
     }, 1500);
   };
 
   return (
-    <div className="min-h-screen text-gray-100 flex flex-col items-center justify-center p-4 relative font-sans">
+    <div className="min-h-screen text-gray-100 flex flex-col relative font-sans">
       <Background />
-      <div className="max-w-2xl w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 relative z-10 flex flex-col gap-6">
+      <TopBar showAIOptimize={false} showExportPDF={false} />
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 relative z-10 flex flex-col gap-6">
         
         <div className="text-center mb-2">
            <h1 className="text-3xl font-bold text-white tracking-tight drop-shadow-sm flex items-center justify-center gap-3">
@@ -83,13 +95,14 @@ export default function UploadPage({ onFileUpload }: UploadPageProps) {
                 </button>
 
                 <button 
+                  onClick={handleStartOptimize}
                   className={`
                     px-6 py-2.5 rounded-xl font-medium text-sm text-white shadow-lg transition-all active:scale-95 flex items-center gap-2
-                    ${!textInput.trim() && !isUploading
+                    ${(!textInput.trim() && !uploadedFile) || isUploading
                       ? 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/5' 
                       : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-white/20 shadow-blue-500/20'}
                   `}
-                  disabled={!textInput.trim() || isUploading}
+                  disabled={(!textInput.trim() && !uploadedFile) || isUploading}
                 >
                   {isUploading ? (
                      <>
@@ -114,6 +127,7 @@ export default function UploadPage({ onFileUpload }: UploadPageProps) {
         </div>
         
         <p className="text-center text-xs text-gray-500">支持 PDF, DOCX 格式，或直接粘贴文本</p>
+        </div>
       </div>
     </div>
   );

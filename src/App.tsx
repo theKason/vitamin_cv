@@ -1,10 +1,51 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import UploadPage from './pages/UploadPage';
 import EditorPage from './pages/EditorPage';
+import SignIn from './components/SignIn';
+import { supabase } from './lib/supabase';
 import type { ResumeData } from './types';
+import type { User } from '@supabase/supabase-js';
 
-function App() {
+// Auth context
+interface AuthContextType {
+  user: User | null;
+  setUser: (user: User | null) => void;
+}
+
+export const AuthContext = createContext<AuthContextType>({
+  user: null,
+  setUser: () => {},
+});
+
+export const useAuth = () => useContext(AuthContext);
+
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // Check Supabase user
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data?.user || null);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  return <AuthContext.Provider value={{ user, setUser }}>{children}</AuthContext.Provider>;
+};
+
+const ProtectedRoutes = () => {
+  const { user } = useAuth();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const [resumeData, setResumeData] = useState<ResumeData>({
@@ -30,25 +71,40 @@ function App() {
     setUploadedFile(file);
   };
 
+  const handleSignIn = () => {
+    window.location.reload();
+  };
+
+  if (!user) {
+    return <SignIn onSignIn={handleSignIn} />;
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<UploadPage onFileUpload={handleFileUpload} />} />
+      <Route 
+        path="/editor" 
+        element={
+          <EditorPage 
+            uploadedFile={uploadedFile}
+            resumeData={resumeData}
+            onInputChange={handleInputChange}
+          />
+        } 
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
+
+function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<UploadPage onFileUpload={handleFileUpload} />} />
-        <Route 
-          path="/editor" 
-          element={
-            <EditorPage 
-              uploadedFile={uploadedFile}
-              resumeData={resumeData}
-              onInputChange={handleInputChange}
-            />
-          } 
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <AuthProvider>
+        <ProtectedRoutes />
+      </AuthProvider>
     </BrowserRouter>
   );
 }
 
 export default App;
-
