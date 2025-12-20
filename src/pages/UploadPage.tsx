@@ -2,25 +2,26 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, FileText, Paperclip } from 'lucide-react';
 import Background from '../components/Background';
+import type { UploadPageProps } from '../types';
 
-export default function UploadPage({ onFileUpload }) {
+export default function UploadPage({ onFileUpload }: UploadPageProps) {
   const navigate = useNavigate();
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [textInput, setTextInput] = useState('');
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) processFile(file);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragOver(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
   };
 
-  const processFile = (file) => {
+  const processFile = (file: File) => {
     setIsUploading(true);
     setTimeout(() => {
       setIsUploading(false);
@@ -117,3 +118,4 @@ export default function UploadPage({ onFileUpload }) {
     </div>
   );
 }
+

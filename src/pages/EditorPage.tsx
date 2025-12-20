@@ -5,11 +5,12 @@ import Background from '../components/Background';
 import SidebarItem from '../components/SidebarItem';
 import ResumePreview from '../components/ResumePreview';
 import { RESUME_SECTIONS } from '../constants/resumeSections';
+import type { EditorPageProps } from '../types';
 
-export default function EditorPage({ uploadedFile, resumeData, onInputChange }) {
+export default function EditorPage({ uploadedFile, resumeData, onInputChange }: EditorPageProps) {
   const navigate = useNavigate();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [expandedSection, setExpandedSection] = useState('basic');
+  const [expandedSection, setExpandedSection] = useState<string | null>('basic');
 
   return (
     <div className="h-screen flex flex-col font-sans overflow-hidden relative">
@@ -91,3 +92,4 @@ export default function EditorPage({ uploadedFile, resumeData, onInputChange }) 
     </div>
   );
 }
+

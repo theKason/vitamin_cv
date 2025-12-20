@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import type { SidebarItemProps } from '../types';
 
-export default function SidebarItem({ section, isExpanded, onToggle, resumeData, onInputChange }) {
+export default function SidebarItem({ section, isExpanded, onToggle, resumeData, onInputChange }: SidebarItemProps) {
   return (
     <div className="mb-3 px-2">
       <button

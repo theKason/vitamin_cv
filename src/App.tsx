@@ -2,11 +2,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import UploadPage from './pages/UploadPage';
 import EditorPage from './pages/EditorPage';
+import type { ResumeData } from './types';
 
 function App() {
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-  const [resumeData, setResumeData] = useState({
+  const [resumeData, setResumeData] = useState<ResumeData>({
     name: 'Alex Chen',
     title: 'Senior Product Designer',
     email: 'alex@example.com',
@@ -21,11 +22,11 @@ function App() {
     skills: ['Figma', 'React', 'TypeScript', 'Node.js', 'UI/UX Design']
   });
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof ResumeData, value: string | ResumeData['experience'] | string[]) => {
     setResumeData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileUpload = (file) => {
+  const handleFileUpload = (file: File) => {
     setUploadedFile(file);
   };
 
@@ -50,3 +51,4 @@ function App() {
 }
 
 export default App;
+

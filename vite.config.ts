@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   plugins: [
@@ -11,7 +14,7 @@ export default defineConfig({
           process.env.NODE_ENV === 'development' 
             ? './babel-plugin-add-source-location.cjs'
             : null
-        ].filter(Boolean),
+        ].filter(Boolean) as string[],
       },
     }),
   ],
