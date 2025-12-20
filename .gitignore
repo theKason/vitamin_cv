@@ -41,3 +41,6 @@ pnpm-debug.log*
 
 # documents
 /docs
+
+# environment variables
+.env

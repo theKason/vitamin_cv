@@ -1,3 +1,6 @@
+/**
+ * This file contains the resume sections and their icons
+ */
 import { 
   User, 
   FileText, 
@@ -6,8 +9,9 @@ import {
   Layout, 
   Award
 } from 'lucide-react';
+import type { ResumeSection } from '../types';
 
-export const RESUME_SECTIONS = [
+export const RESUME_SECTIONS: ResumeSection[] = [
   { id: 'basic', label: '基本信息', icon: User },
   { id: 'summary', label: '个人总结', icon: FileText },
   { id: 'experience', label: '工作经历', icon: Briefcase },

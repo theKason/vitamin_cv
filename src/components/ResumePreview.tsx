@@ -1,6 +1,7 @@
 import { Mail, Phone, MapPin, Globe, User, Briefcase, Award } from 'lucide-react';
+import type { ResumePreviewProps } from '../types';
 
-export default function ResumePreview({ resumeData }) {
+export default function ResumePreview({ resumeData }: ResumePreviewProps) {
   return (
     <div className="bg-white text-gray-800 w-full max-w-[210mm] min-h-[297mm] mx-auto shadow-2xl p-[15mm] md:p-[20mm] relative">
       {/* 头部 */}

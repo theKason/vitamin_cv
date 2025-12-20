@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import type { SidebarItemProps } from '../types';
 
-export default function SidebarItem({ section, isExpanded, onToggle, resumeData, onInputChange }) {
+export default function SidebarItem({ section, isExpanded, onToggle, resumeData, onInputChange }: SidebarItemProps) {
   return (
     <div className="mb-3 px-2">
       <button
@@ -27,6 +28,7 @@ export default function SidebarItem({ section, isExpanded, onToggle, resumeData,
             <>
               <div className="space-y-1.5 group">
                 <label className="text-xs font-medium text-slate-400 pl-1 group-focus-within:text-blue-400 transition-colors">姓名</label>
+                {/*onInputChange: 状态提升到 App，通过回调函数让子组件更新父组件状态，从而实现子组件和父组件的通信*/}
                 <input value={resumeData.name} onChange={(e) => onInputChange('name', e.target.value)} className="w-full bg-white/5 border border-white/10 hover:border-white/20 rounded-xl p-2.5 text-sm text-white focus:bg-white/10 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" />
               </div>
               <div className="space-y-1.5 group">
