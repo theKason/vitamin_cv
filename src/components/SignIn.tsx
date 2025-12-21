@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { Mail, Lock, LogIn, UserPlus, Loader2 } from 'lucide-react';
 import Background from './Background';
 import { supabase } from '../lib/supabase';
+import type { UserInfo } from '../types';
 
 interface SignInProps {
-  onSignIn: () => void;
+  setUserInfo: (userInfo: UserInfo | null) => void;
 }
 
-export default function SignIn({ onSignIn }: SignInProps) {
+export default function SignIn({ setUserInfo }: SignInProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -24,12 +25,21 @@ export default function SignIn({ onSignIn }: SignInProps) {
       setGoogleLoading(true);
       setError('');
       try {
-        const { error } = await supabase.auth.signInWithIdToken({
+        const { data, error } = await supabase.auth.signInWithIdToken({
           provider: 'google',
           token: response.credential,
         });
         if (error) throw error;
-        onSignIn();
+        
+        // 保存用户信息
+        if (data?.session?.user?.identities?.[0]?.identity_data) {
+          const identityData = data.session.user.identities[0].identity_data;
+          setUserInfo({
+            avatarUrl: identityData.avatar_url,
+            email: identityData.email,
+            name: identityData.full_name || identityData.name,
+          });
+        }
       } catch (err: any) {
         setError(err.message || 'Google 登录失败');
       } finally {
@@ -40,7 +50,7 @@ export default function SignIn({ onSignIn }: SignInProps) {
     return () => {
       delete (window as any).handleSignInWithGoogle;
     };
-  }, [onSignIn]);
+  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +64,6 @@ export default function SignIn({ onSignIn }: SignInProps) {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        onSignIn();
       }
     } catch (err: any) {
       setError(err.message || '认证失败');

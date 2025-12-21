@@ -27,13 +27,15 @@ export interface ResumeSection {
 }
 
 export interface UploadPageProps {
-  onFileUpload: (file: File) => void;
+  onFileUpload: (file: File | null) => void;
+  uploadedFile: File | null;
 }
 
 export interface EditorPageProps {
   uploadedFile: File | null;
   resumeData: ResumeData;
   onInputChange: (field: keyof ResumeData, value: string | Experience[] | string[]) => void;
+  userInfo?: UserInfo | null;
 }
 
 export interface SidebarItemProps {
@@ -46,5 +48,11 @@ export interface SidebarItemProps {
 
 export interface ResumePreviewProps {
   resumeData: ResumeData;
+}
+
+export interface UserInfo {
+  avatarUrl?: string;
+  email?: string;
+  name?: string;
 }
 

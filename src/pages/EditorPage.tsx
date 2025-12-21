@@ -6,13 +6,13 @@ import ResumePreview from '../components/ResumePreview';
 import { RESUME_SECTIONS } from '../components/resumeSections';
 import type { EditorPageProps } from '../types';
 
-export default function EditorPage({ uploadedFile, resumeData, onInputChange }: EditorPageProps) {
+export default function EditorPage({ uploadedFile, resumeData, onInputChange, userInfo }: EditorPageProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>('basic');
 
   return (
     <div className="h-screen flex flex-col font-sans overflow-hidden relative">
       <Background />
-      <TopBar fileName={uploadedFile?.name || 'resume.pdf'} />
+      <TopBar fileName={uploadedFile?.name || 'resume.pdf'} userInfo={userInfo} />
 
       <div className="flex flex-1 overflow-hidden relative z-10">
         {/* 左侧编辑器 Sidebar - Glass Effect + Rounded Cards */}

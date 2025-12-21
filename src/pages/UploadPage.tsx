@@ -1,21 +1,22 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, FileText, Paperclip } from 'lucide-react';
+import { Upload, Paperclip, X } from 'lucide-react';
 import Background from '../components/Background';
 import TopBar from '../components/TopBar';
+import { useAuth } from '../App';
 import type { UploadPageProps } from '../types';
 
-export default function UploadPage({ onFileUpload }: UploadPageProps) {
+export default function UploadPage({ onFileUpload, uploadedFile }: UploadPageProps) {
   const navigate = useNavigate();
+  const { userInfo } = useAuth();
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [textInput, setTextInput] = useState('');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadedFile(file);
+      onFileUpload(file);
     }
   };
 
@@ -23,19 +24,21 @@ export default function UploadPage({ onFileUpload }: UploadPageProps) {
     e.preventDefault();
     setIsDragOver(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setUploadedFile(e.dataTransfer.files[0]);
+      onFileUpload(e.dataTransfer.files[0]);
     }
   };
 
+  const handleRemoveFile = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 阻止事件冒泡
+    onFileUpload(null); // 清空文件
+  };
+
   const handleStartOptimize = () => {
-    if (!textInput.trim() && !uploadedFile) return;
+    if (!textInput.trim() || !uploadedFile) return;
     
     setIsUploading(true);
     setTimeout(() => {
       setIsUploading(false);
-      if (uploadedFile) {
-        onFileUpload(uploadedFile);
-      }
       navigate('/editor');
     }, 1500);
   };
@@ -43,18 +46,18 @@ export default function UploadPage({ onFileUpload }: UploadPageProps) {
   return (
     <div className="min-h-screen text-gray-100 flex flex-col relative font-sans">
       <Background />
-      <TopBar showAIOptimize={false} showExportPDF={false} />
+      <TopBar showAIOptimize={false} showExportPDF={false} userInfo={userInfo} />
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="max-w-2xl w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 relative z-10 flex flex-col gap-6">
         
         <div className="text-center mb-2">
-           <h1 className="text-3xl font-bold text-white tracking-tight drop-shadow-sm flex items-center justify-center gap-3">
+           {/* <h1 className="text-3xl font-bold text-white tracking-tight drop-shadow-sm flex items-center justify-center gap-3">
              <div className="h-10 w-10 bg-gradient-to-br from-blue-500/80 to-indigo-600/80 rounded-xl flex items-center justify-center shadow-lg border border-white/20">
                 <FileText className="h-6 w-6 text-white" />
              </div>
              Vitamin CV
-           </h1>
-           <p className="text-blue-100/70 mt-2 text-sm font-medium">粘贴简历内容 或 上传 PDF/DOCX</p>
+           </h1> */}
+           {/* <p className="text-blue-100/70 mt-2 text-sm font-medium">粘贴岗位内容 或 上传 PDF/DOCX</p> */}
         </div>
 
         <div 
@@ -77,12 +80,22 @@ export default function UploadPage({ onFileUpload }: UploadPageProps) {
           />
 
           <div className="absolute bottom-4 right-4 left-4 flex justify-between items-center pointer-events-none">
-             <div className={`text-xs text-blue-300/70 transition-opacity duration-300 ${isDragOver ? 'opacity-100' : 'opacity-0'}`}>
-                <Upload className="inline w-3 h-3 mr-1" /> 释放以上传
-             </div>
              <div className="flex-1"></div>
 
              <div className="flex items-center gap-2 pointer-events-auto">
+                {/* 显示文件名的 div */}
+                {uploadedFile && (
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 border border-white/20 rounded-lg text-sm text-gray-200 max-w-[200px] group">
+                    <span className="truncate">{uploadedFile.name}</span>
+                    <button
+                      onClick={handleRemoveFile}
+                      className="flex-shrink-0 p-0.5 rounded hover:bg-white/20 transition-colors"
+                      title="删除文件"
+                    >
+                      <X className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
+                    </button>
+                  </div>
+                )}
                 <input id="file-upload" type="file" className="hidden" accept=".pdf,.docx" onChange={handleFileChange} disabled={isUploading} />
                 
                 <button 
@@ -102,7 +115,7 @@ export default function UploadPage({ onFileUpload }: UploadPageProps) {
                       ? 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/5' 
                       : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-white/20 shadow-blue-500/20'}
                   `}
-                  disabled={(!textInput.trim() && !uploadedFile) || isUploading}
+                  disabled={!(textInput.trim() && uploadedFile)}
                 >
                   {isUploading ? (
                      <>
