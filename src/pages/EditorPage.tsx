@@ -6,17 +6,17 @@ import ResumePreview from '../components/ResumePreview';
 import { RESUME_SECTIONS } from '../components/resumeSections';
 import type { EditorPageProps } from '../types';
 
-export default function EditorPage({ uploadedFile, resumeData, onInputChange }: EditorPageProps) {
+export default function EditorPage({ uploadedFile, resumeData, onInputChange, userInfo }: EditorPageProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>('basic');
 
   return (
     <div className="h-screen flex flex-col font-sans overflow-hidden relative">
       <Background />
-      <TopBar fileName={uploadedFile?.name || 'resume.pdf'} />
+      <TopBar fileName={uploadedFile?.name || 'resume.pdf'} userInfo={userInfo} />
 
       <div className="flex flex-1 overflow-hidden relative z-10">
         {/* 左侧编辑器 Sidebar - Glass Effect + Rounded Cards */}
-        <aside className="w-80 md:w-96 bg-slate-900/40 backdrop-blur-xl border-r border-white/5 flex flex-col z-10 shadow-2xl overflow-y-auto custom-scrollbar">
+        <aside className="w-96 md:w-[28rem] bg-slate-900/40 backdrop-blur-xl border-r border-white/5 flex flex-col z-10 shadow-2xl overflow-y-auto custom-scrollbar">
           <div className="p-6 pb-2">
              <h2 className="text-xs font-bold text-blue-200/50 uppercase tracking-widest mb-4 ml-1">CONTENT EDITOR</h2>
           </div>
