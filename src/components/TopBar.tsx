@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { FileText, Sparkles, LogOut } from 'lucide-react';
+import { FileText, LogOut } from 'lucide-react';
 
 import type { UserInfo } from '../types';
 
 interface TopBarProps {
   fileName?: string;
-  showAIOptimize?: boolean;
   showExportPDF?: boolean;
   userInfo?: UserInfo | null;
 }
