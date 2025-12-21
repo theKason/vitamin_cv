@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import UploadPage from './pages/UploadPage';
 import EditorPage from './pages/EditorPage';
 import SignIn from './components/SignIn';
@@ -24,25 +24,32 @@ export const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+const USER_INFO_STORAGE_KEY = 'userInfo';
+
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // 从 localStorage 初始化 userInfo
+  const [userInfo, setUserInfoState] = useState<UserInfo | null>(() => {
+    try {
+      const stored = localStorage.getItem(USER_INFO_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [user, setUser] = useState<User | null>(null);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  // 包装 setUserInfo，同时保存到 localStorage
+  const setUserInfo = useCallback((info: UserInfo | null) => {
+    setUserInfoState(info);
+    if (info) {
+      localStorage.setItem(USER_INFO_STORAGE_KEY, JSON.stringify(info));
+    } else {
+      localStorage.removeItem(USER_INFO_STORAGE_KEY);
+    }
+  }, []);
 
   useEffect(() => {
-    // Check Supabase user
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data?.user || null);
-      // 初始化用户信息
-      if (data?.user?.identities?.[0]?.identity_data) {
-        const identityData = data.user.identities[0].identity_data;
-        setUserInfo({
-          avatarUrl: identityData.avatar_url,
-          email: identityData.email,
-          name: identityData.full_name || identityData.name,
-        });
-      }
-    });
-
     // Listen for auth changes
     const {
       data: { subscription },
@@ -65,7 +72,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [setUserInfo]);
 
   return <AuthContext.Provider value={{ user, setUser, userInfo, setUserInfo }}>{children}</AuthContext.Provider>;
 };

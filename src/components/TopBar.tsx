@@ -12,7 +12,6 @@ interface TopBarProps {
 
 export default function TopBar({ 
   fileName, 
-  showAIOptimize = true, 
   showExportPDF = true,
   userInfo 
 }: TopBarProps) {
@@ -40,11 +39,6 @@ export default function TopBar({
         </div>
         
         <div className="flex items-center gap-4">
-          {showAIOptimize && (
-            <button className="hidden md:flex items-center gap-2 px-4 py-2 text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-full transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 border border-white/10">
-              <Sparkles size={14} className="animate-pulse" /> AI 智能优化
-            </button>
-          )}
           {showExportPDF && (
             <button className="flex items-center gap-2 px-4 py-2 text-xs font-medium bg-white/10 hover:bg-white/20 text-white rounded-full transition-all border border-white/10 backdrop-blur-sm">
               导出 PDF
