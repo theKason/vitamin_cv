@@ -44,3 +44,7 @@ pnpm-debug.log*
 
 # environment variables
 .env
+
+# IDE settings
+.vscode
+.cursor

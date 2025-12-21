@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mail, Lock, LogIn, UserPlus, Loader2 } from 'lucide-react';
 import Background from './Background';
 import { supabase } from '../lib/supabase';
@@ -16,6 +16,31 @@ export default function SignIn({ onSignIn }: SignInProps) {
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState('');
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Set up global callback for Google Sign-In
+  useEffect(() => {
+    (window as any).handleSignInWithGoogle = async (response: any) => {
+      setGoogleLoading(true);
+      setError('');
+      try {
+        const { error } = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: response.credential,
+        });
+        if (error) throw error;
+        onSignIn();
+      } catch (err: any) {
+        setError(err.message || 'Google 登录失败');
+      } finally {
+        setGoogleLoading(false);
+      }
+    };
+
+    return () => {
+      delete (window as any).handleSignInWithGoogle;
+    };
+  }, [onSignIn]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,6 +233,42 @@ export default function SignIn({ onSignIn }: SignInProps) {
             </div>
           )}
         </form>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/10"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-transparent text-slate-400">或</span>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div
+            id="g_id_onload"
+            data-client_id="459290572396-egkc9kg4l52q5j5nqtl3kjfr14nga0ui.apps.googleusercontent.com"
+            data-context="signin"
+            data-ux_mode="popup"
+            data-callback="handleSignInWithGoogle"
+            data-itp_support="true"
+            data-use_fedcm_for_prompt="true"
+          ></div>
+          <div
+            className="g_id_signin"
+            data-type="standard"
+            data-shape="rectangular"
+            data-theme="outline"
+            data-text="signin_with"
+            data-size="large"
+            data-logo_alignment="left"
+          ></div>
+          {googleLoading && (
+            <div className="flex items-center justify-center gap-2 text-sm text-slate-400">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Google 登录中...</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
