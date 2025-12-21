@@ -46,7 +46,7 @@ export default function UploadPage({ onFileUpload, uploadedFile }: UploadPagePro
   return (
     <div className="min-h-screen text-gray-100 flex flex-col relative font-sans">
       <Background />
-      <TopBar userInfo={userInfo} />
+      <TopBar userInfo={userInfo} showExportPDF={userInfo ? false : true} />
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="max-w-2xl w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 relative z-10 flex flex-col gap-6">
         
