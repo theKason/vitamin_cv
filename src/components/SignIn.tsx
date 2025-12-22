@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Mail, Lock, LogIn, UserPlus, Loader2 } from 'lucide-react';
 import Background from './Background';
 import { supabase } from '../lib/supabase';
@@ -15,6 +15,7 @@ export default function SignIn() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState('');
   const [googleLoading, setGoogleLoading] = useState(false);
+  const googleButtonRef = useRef<HTMLDivElement>(null);
 
   // Set up global callback for Google Sign-In
   useEffect(() => {
@@ -48,6 +49,42 @@ export default function SignIn() {
       delete (window as any).handleSignInWithGoogle;
     };
   }, [setUserInfo]);
+
+  // Initialize Google Sign-In button
+  useEffect(() => {
+    const initGoogle = () => {
+      const google = (window as any).google;
+      if (!google?.accounts?.id || !googleButtonRef.current) return;
+
+      google.accounts.id.initialize({
+        client_id: '459290572396-egkc9kg4l52q5j5nqtl3kjfr14nga0ui.apps.googleusercontent.com',
+        callback: (window as any).handleSignInWithGoogle,
+        context: 'signin',
+        ux_mode: 'popup',
+      });
+
+      google.accounts.id.renderButton(googleButtonRef.current, {
+        type: 'standard',
+        shape: 'rectangular',
+        theme: 'outline',
+        text: 'signin_with',
+        size: 'large',
+        logo_alignment: 'left',
+      });
+    };
+
+    if ((window as any).google?.accounts?.id) {
+      initGoogle();
+    } else {
+      const checkInterval = setInterval(() => {
+        if ((window as any).google?.accounts?.id) {
+          clearInterval(checkInterval);
+          initGoogle();
+        }
+      }, 100);
+      return () => clearInterval(checkInterval);
+    }
+  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -250,24 +287,7 @@ export default function SignIn() {
         </div>
 
         <div className="space-y-2">
-          <div
-            id="g_id_onload"
-            data-client_id="459290572396-egkc9kg4l52q5j5nqtl3kjfr14nga0ui.apps.googleusercontent.com"
-            data-context="signin"
-            data-ux_mode="popup"
-            data-callback="handleSignInWithGoogle"
-            data-itp_support="true"
-            data-use_fedcm_for_prompt="true"
-          ></div>
-          <div
-            className="g_id_signin"
-            data-type="standard"
-            data-shape="rectangular"
-            data-theme="outline"
-            data-text="signin_with"
-            data-size="large"
-            data-logo_alignment="left"
-          ></div>
+          <div ref={googleButtonRef}></div>
           {googleLoading && (
             <div className="flex items-center justify-center gap-2 text-sm text-slate-400">
               <Loader2 className="w-4 h-4 animate-spin" />
