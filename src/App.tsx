@@ -7,7 +7,7 @@ import { AuthProvider, useAuth } from './lib/auth';
 import type { ResumeData } from './types';
 
 const ProtectedRoutes = () => {
-  const { user, setUserInfo } = useAuth();
+  const { user } = useAuth();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const [resumeData, setResumeData] = useState<ResumeData>({
@@ -36,7 +36,7 @@ const ProtectedRoutes = () => {
 
 
   if (!user) {
-    return <SignIn setUserInfo={setUserInfo} />;
+    return <SignIn />;
   }
 
   return (
