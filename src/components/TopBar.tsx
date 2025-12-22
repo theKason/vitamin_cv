@@ -51,6 +51,7 @@ export default function TopBar({
                 src={userInfo.avatarUrl} 
                 alt="User avatar" 
                 className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
               />
             ) : (
               'AL'

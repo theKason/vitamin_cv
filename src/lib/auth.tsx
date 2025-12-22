@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   userInfo: UserInfo | null;
-  setUserInfo: (userInfo: UserInfo | null) => void;
+  setUserInfo: (userInfo: UserInfo | null | ((prev: UserInfo | null) => UserInfo | null)) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -36,13 +36,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   // 包装 setUserInfo，同时保存到 localStorage
-  const setUserInfo = useCallback((info: UserInfo | null) => {
-    setUserInfoState(info);
-    if (info) {
-      localStorage.setItem(USER_INFO_STORAGE_KEY, JSON.stringify(info));
-    } else {
-      localStorage.removeItem(USER_INFO_STORAGE_KEY);
-    }
+  const setUserInfo = useCallback((info: UserInfo | null | ((prev: UserInfo | null) => UserInfo | null)) => {
+    setUserInfoState(prev => {
+      const newInfo = typeof info === 'function' ? info(prev) : info;
+      if (newInfo) {
+        localStorage.setItem(USER_INFO_STORAGE_KEY, JSON.stringify(newInfo));
+      } else {
+        localStorage.removeItem(USER_INFO_STORAGE_KEY);
+      }
+      return newInfo;
+    });
   }, []);
 
   useEffect(() => {
@@ -51,11 +54,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user || null);
       if (session?.user?.identities?.[0]?.identity_data) {
         const identityData = session.user.identities[0].identity_data;
-        setUserInfo({
-          avatarUrl: identityData.avatar_url,
-          email: identityData.email,
-          name: identityData.full_name || identityData.name,
-        });
+        setUserInfo((prev: UserInfo | null) => ({
+          avatarUrl: identityData.avatar_url ?? identityData.picture ?? identityData.avatarUrl ?? prev?.avatarUrl,
+          email: identityData.email ?? prev?.email,
+          name: identityData.full_name || identityData.name || identityData.display_name || prev?.name,
+        }));
       }
     });
 
@@ -68,11 +71,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // 更新用户信息
       if (session?.user?.identities?.[0]?.identity_data) {
         const identityData = session.user.identities[0].identity_data;
-        setUserInfo({
-          avatarUrl: identityData.avatar_url,
-          email: identityData.email,
-          name: identityData.full_name || identityData.name,
-        });
+        setUserInfo((prev: UserInfo | null) => ({
+          avatarUrl: identityData.avatar_url ?? identityData.picture ?? identityData.avatarUrl ?? prev?.avatarUrl,
+          email: identityData.email ?? prev?.email,
+          name: identityData.full_name || identityData.name || identityData.display_name || prev?.name,
+        }));
       } else if (event === 'SIGNED_OUT' || !session) {
         // 只在明确登出时才清空 userInfo
         setUserInfo(null);
