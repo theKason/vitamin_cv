@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import { FileText, LogOut } from 'lucide-react';
-
-import type { UserInfo } from '../types';
+import { useAuth } from '../lib/auth';
 
 interface TopBarProps {
   fileName?: string;
   showExportPDF?: boolean;
-  userInfo?: UserInfo | null;
 }
 
 export default function TopBar({ 
   fileName, 
-  showExportPDF = true,
-  userInfo 
+  showExportPDF = true
 }: TopBarProps) {
+  const { userInfo } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -53,6 +51,7 @@ export default function TopBar({
                 src={userInfo.avatarUrl} 
                 alt="User avatar" 
                 className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
               />
             ) : (
               'AL'

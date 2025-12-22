@@ -2,13 +2,10 @@ import { useState, useEffect } from 'react';
 import { Mail, Lock, LogIn, UserPlus, Loader2 } from 'lucide-react';
 import Background from './Background';
 import { supabase } from '../lib/supabase';
-import type { UserInfo } from '../types';
+import { useAuth } from '../lib/auth';
 
-interface SignInProps {
-  setUserInfo: (userInfo: UserInfo | null) => void;
-}
-
-export default function SignIn({ setUserInfo }: SignInProps) {
+export default function SignIn() {
+  const { setUserInfo } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -50,7 +47,7 @@ export default function SignIn({ setUserInfo }: SignInProps) {
     return () => {
       delete (window as any).handleSignInWithGoogle;
     };
-  }, []);
+  }, [setUserInfo]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
