@@ -1,84 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import { useState } from 'react';
 import UploadPage from './pages/UploadPage';
 import EditorPage from './pages/EditorPage';
 import SignIn from './components/SignIn';
-import { supabase } from './lib/supabase';
-import type { ResumeData, UserInfo } from './types';
-import type { User } from '@supabase/supabase-js';
-
-// Auth context
-interface AuthContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  userInfo: UserInfo | null;
-  setUserInfo: (userInfo: UserInfo | null) => void;
-}
-
-export const AuthContext = createContext<AuthContextType>({
-  user: null,
-  setUser: () => {},
-  userInfo: null,
-  setUserInfo: () => {},
-});
-
-export const useAuth = () => useContext(AuthContext);
-
-const USER_INFO_STORAGE_KEY = 'userInfo';
-
-const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  // 从 localStorage 初始化 userInfo
-  const [userInfo, setUserInfoState] = useState<UserInfo | null>(() => {
-    try {
-      const stored = localStorage.getItem(USER_INFO_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const [user, setUser] = useState<User | null>(null);
-
-  // 包装 setUserInfo，同时保存到 localStorage
-  const setUserInfo = useCallback((info: UserInfo | null) => {
-    setUserInfoState(info);
-    if (info) {
-      localStorage.setItem(USER_INFO_STORAGE_KEY, JSON.stringify(info));
-    } else {
-      localStorage.removeItem(USER_INFO_STORAGE_KEY);
-    }
-  }, []);
-
-  useEffect(() => {
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_, session) => {
-      setUser(session?.user || null);
-      
-      // 更新用户信息
-      if (session?.user?.identities?.[0]?.identity_data) {
-        const identityData = session.user.identities[0].identity_data;
-        setUserInfo({
-          avatarUrl: identityData.avatar_url,
-          email: identityData.email,
-          name: identityData.full_name || identityData.name,
-        });
-      } else {
-        setUserInfo(null);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [setUserInfo]);
-
-  return <AuthContext.Provider value={{ user, setUser, userInfo, setUserInfo }}>{children}</AuthContext.Provider>;
-};
+import { AuthProvider, useAuth } from './lib/auth';
+import type { ResumeData } from './types';
 
 const ProtectedRoutes = () => {
-  const { user, userInfo, setUserInfo } = useAuth();
+  const { user, setUserInfo } = useAuth();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const [resumeData, setResumeData] = useState<ResumeData>({
@@ -120,7 +49,6 @@ const ProtectedRoutes = () => {
             uploadedFile={uploadedFile}
             resumeData={resumeData}
             onInputChange={handleInputChange}
-            userInfo={userInfo}
           />
         } 
       />

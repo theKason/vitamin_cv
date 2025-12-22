@@ -35,7 +35,6 @@ export interface EditorPageProps {
   uploadedFile: File | null;
   resumeData: ResumeData;
   onInputChange: (field: keyof ResumeData, value: string | Experience[] | string[]) => void;
-  userInfo?: UserInfo | null;
 }
 
 export interface SidebarItemProps {
