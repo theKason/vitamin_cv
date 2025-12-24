@@ -15,6 +15,7 @@ export default function SignIn() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState('');
   const [googleLoading, setGoogleLoading] = useState(false);
+  {/*useRef 是一个 React Hook，它能帮助引用一个不需要渲染的值。*/}
   const googleButtonRef = useRef<HTMLDivElement>(null);
 
   // Set up global callback for Google Sign-In
